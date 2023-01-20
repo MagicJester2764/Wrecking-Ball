@@ -1,15 +1,19 @@
-import os
-import servicemanager
-import shutil
 import subprocess
-import sys
 
-import win32event
-import win32service
-import win32serviceutil
+#payload = "cmd.exe /c powershell.exe"
+#subprocess.Popen("wmic process call create '" + payload + "'", shell=True)
 
-SRCDIR = 'C:\\Users\\rupnat0120a\\Desktop\\Wrecking Ball'
-TGTDIR = 'C:\\Windows\\TEMP'
+import pywinpty
 
-class Win32ServerSvc(win32serviceutil.ServiceFramework):
-    _svc_name_ = ""
+(master_fd, slave_fd) = pywinpty.open()
+
+pid, handle = pywinpty.spawn("cmd.exe", master_fd=master_fd)
+
+output = pywinpty.read(master_fd)
+print(output.decode())
+
+pywinpty.write(master_fd, "dir\n")
+output = pywinpty.read(master_fd)
+print(output.decode())
+
+pywinpty.close(master_fd, slave_fd, pid, handle)
